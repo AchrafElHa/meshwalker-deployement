@@ -1,7 +1,7 @@
 
 import tensorflow as tf
 from tensorflow import keras
-import pickle
+# import pickle
 import rnn_model
 import json
 from easydict import EasyDict
@@ -31,8 +31,3 @@ model = rnn_model.RnnWalkNet(params, params.n_classes, params.net_input_dim-1 , 
 
 model.load_weights('./model_trained/model_mesh.keras')
 # print(model.summary())
-
-print("################################")
-
-
-print(model.predict([[[84,82,83]]]))
