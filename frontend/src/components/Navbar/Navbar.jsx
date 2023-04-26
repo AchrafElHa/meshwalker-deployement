@@ -21,7 +21,7 @@ export default function Navbar () {
             <div className="sidebar">
                 <NavLink to="/home">
                     <span className="material-icons-sharp">grid_view</span>
-                    <h3>Dashboard</h3>
+                    <h3>Home</h3>
                 </NavLink>
 
                 <NavLink to="/aboutus">
