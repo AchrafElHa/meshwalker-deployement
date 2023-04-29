@@ -9,12 +9,12 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
 
-# import utils
+import utils
 
 from tensorflow import keras
-# from tf.keras.layers import vis_utils
-
 layers = tf.keras.layers
+
+
 class RnnWalkBase(tf.keras.Model):
   def __init__(self,
                params,
@@ -37,7 +37,7 @@ class RnnWalkBase(tf.keras.Model):
       tmp_model = keras.Model(inputs=inputs, outputs=outputs, name='WalkModel')
       tmp_model.summary(print_fn=self._print_fn)
       tf.keras.utils.plot_model(tmp_model, params.logdir + '/RnnWalkModel.png', show_shapes=True)
-    
+
     self.manager = None
     if optimizer:
       if model_fn:
@@ -65,13 +65,12 @@ class RnnWalkBase(tf.keras.Model):
     iters_saved = [int(f.split('model2keep__')[-1].split('.keras')[0]) for f in filenames]
     return filenames[np.argmax(iters_saved)]
 
-  def load_weights(self, filepath):
+  def load_weights(self, filepath=None):
     if filepath is not None and filepath.endswith('.keras'):
-      print('Loading weights from: ', filepath)
       super(RnnWalkBase, self).load_weights(filepath)
     elif filepath is None:
       _ = self.checkpoint.restore(self.manager.latest_checkpoint)
-      # print(utils.color.BLUE, 'Starting from iteration: ', self.checkpoint.optimizer.iterations.numpy(), utils.color.END)
+      print(utils.color.BLUE, 'Starting from iteration: ', self.checkpoint.optimizer.iterations.numpy(), utils.color.END)
     else:
       filepath = filepath.replace('//', '/')
       _ = self.checkpoint.restore(filepath)
