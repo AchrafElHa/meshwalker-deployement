@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../../assets/css/home.css';
+import '../../assets/css/ObjViewer.css';
+import ObjViewer from './ObjViewer.jsx';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"
 
@@ -13,7 +15,8 @@ function Home() {
     theme: "dark",
 };
   const [file, setFile] = useState(null);
-
+  const [objUrl, setObjUrl] = useState(null);
+  const [showObjViewer, setShowObjViewer] = useState(false);
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
   };
@@ -27,7 +30,17 @@ function Home() {
       toast.error('Please upload a .obj file', toastOptions);
       return;
     }
+    const reader = new FileReader();
 
+    reader.onload = function(event) {
+      const url = URL.createObjectURL(new Blob([event.target.result], { type: 'text/plain' }));
+      setObjUrl(url);
+      setShowObjViewer(true);
+      console.log("here");
+      
+    };
+
+    reader.readAsText(file);
     try {
       var response = await axios.post('http://localhost:5000/upload', formData, {
         headers: {
@@ -45,18 +58,20 @@ function Home() {
   return (
     <>
         <main>
-            <div className="aboutus-holder"><br />
-                <h1>Home :</h1><br /><br />
+            <h1>Home :</h1><br /><br />
+            <div className="aboutus-holder" id="aboutus-holder"><br />
+                <div id="objViewerDiv"></div>
                 <div className='form-holder'>
                     <div className='title-form'> 
                         <h2>Choose a file to upload</h2>
                     </div><br />
 
                     <form onSubmit={handleSubmit}>
-                        <div className="form-group">
+                        <div className="form-group" id>
+                            {showObjViewer && <ObjViewer url={objUrl}/>}
                             <label className="form-label"><h3>Choose a file:</h3></label>
                             <input type="file" className="form-control-file" accept=".obj" onChange={handleFileChange} />
-                        </div><br />
+                        </div>
                         <div className='btn-holder'>
                             <button type="submit" className="btn btn-primary">Submit</button>
                         </div>
@@ -70,4 +85,3 @@ function Home() {
 }
 
 export default Home;
-
