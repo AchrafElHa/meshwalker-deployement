@@ -3,7 +3,7 @@ import glob, os, copy
 import tensorflow as tf
 import numpy as np
 
-#import utils
+import utils
 import walks
 import dataset_prepare
 
@@ -149,7 +149,6 @@ def setup_features_params(dataset_params, params):
 
   dataset_params.edges_needed = True
   if params.walk_alg == 'random_global_jumps':
-    # pass
     dataset_params.walk_function = walks.get_seq_random_walk_random_global_jumps
   else:
     raise Exception('Walk alg not recognized: ' + params.walk_alg)
@@ -319,5 +318,9 @@ def tf_mesh_dataset(params, pathname_expansion, mode=None, size_limit=np.inf, sh
   return ds, n_items
 
 if __name__ == '__main__':
+<<<<<<< HEAD
   #utils.config_gpu(False)
+=======
+  utils.config_gpu(False)
+>>>>>>> 3d4235ff859f2255828a26145aa89ee7cf336c49
   np.random.seed(1)

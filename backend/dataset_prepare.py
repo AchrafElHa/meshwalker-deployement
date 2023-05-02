@@ -1,13 +1,14 @@
 import glob, os, shutil, sys, json
 from pathlib import Path
 
-from matplotlib import pylab as plt
+import pylab as plt
 import trimesh
-# import open3d
+import open3d
 from easydict import EasyDict
 import numpy as np
 from tqdm import tqdm
 
+import utils
 
 
 # Labels for all datasets
@@ -220,12 +221,12 @@ def prepare_directory(dataset_name, pathname_expansion=None, p_out=None, n_targe
 
   if not os.path.isdir(p_out):
     os.makedirs(p_out)
-
   filenames = glob.glob(pathname_expansion)
   filenames.sort()
   if len(filenames) > size_limit:
     filenames = filenames[:size_limit]
   for file in tqdm(filenames, disable=1 - verbose):
+    file = file.replace("\\","/")
     out_fn = p_out + '/' + fn_prefix + os.path.split(file)[1].split('.')[0]
     mesh = load_mesh(file, classification=classification)
     mesh_orig = mesh
