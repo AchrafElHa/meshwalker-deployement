@@ -318,9 +318,5 @@ def tf_mesh_dataset(params, pathname_expansion, mode=None, size_limit=np.inf, sh
   return ds, n_items
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-  #utils.config_gpu(False)
-=======
   utils.config_gpu(False)
->>>>>>> 3d4235ff859f2255828a26145aa89ee7cf336c49
   np.random.seed(1)

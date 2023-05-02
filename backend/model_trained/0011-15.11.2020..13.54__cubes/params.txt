@@ -1,6 +1,6 @@
 {
   "adjust_vertical_model": false,
-  "batch_size": 32,
+  "batch_size": 8,
   "classes_indices_to_use": null,
   "cont_run_number": 0,
   "cycle_opt_prms": {
@@ -10,67 +10,44 @@
   },
   "datasets2use": {
     "test": [
-      "datasets_processed/cubes/*test*.npz"
+      "datasets_processed/human_seg_from_meshcnn/*test*.npz"
     ],
     "train": [
-      "datasets_processed/cubes/*train*.npz"
+      "datasets_processed/human_seg_from_meshcnn/*train*.npz"
     ]
   },
   "full_accuracy_test": {
-    "dataset_expansion": "datasets_processed/cubes/*test*.npz",
-    "labels": [
-      "apple",
-      "bat",
-      "bell",
-      "brick",
-      "camel",
-      "car",
-      "carriage",
-      "chopper",
-      "elephant",
-      "fork",
-      "guitar",
-      "hammer",
-      "heart",
-      "horseshoe",
-      "key",
-      "lmfish",
-      "octopus",
-      "shoe",
-      "spoon",
-      "tree",
-      "turtle",
-      "watch"
-    ]
+    "dataset_expansion": "datasets_processed/human_seg_from_meshcnn/*test*.npz",
+    "n_iters": 32
   },
   "gradient_clip_th": 1,
   "initializers": "orthogonal",
-  "iters_to_train": 460000.0,
+  "iters_to_train": 100000.0,
   "last_layer_actication": "softmax",
   "layer_sizes": null,
   "learning_rate_dynamics": "cycle",
   "log_freq": 100,
-  "logdir": "runs/0011-15.11.2020..13.54__cubes",
-  "min_seq_len": 50,
-  "model_fn": "runs/0011-15.11.2020..13.54__cubes/learned_model.keras",
-  "n_classes": 22,
+  "logdir": "runs/0009-12.04.2023..12.47__human_seg",
+  "min_seq_len": 150,
+  "model_fn": "runs/0009-12.04.2023..12.47__human_seg/learned_model.keras",
+  "n_classes": 9,
   "n_models_per_test_epoch": 300,
-  "n_walks_per_model": 1,
+  "n_walks_per_model": 4,
   "net": "RnnWalkNet",
   "net_gru_dropout": 0,
   "net_input": [
     "dxdydz"
   ],
   "net_start_from_prev_net": null,
-  "network_task": "classification",
+  "network_task": "semantic_segmentation",
   "network_tasks": [
-    "classification"
+    "semantic_segmentation"
   ],
   "normalize_model": true,
-  "one_label_per_model": true,
+  "one_label_per_model": false,
   "optimizer_type": "cycle",
   "run_root_path": "runs",
-  "seq_len": 100,
+  "seq_len": 300,
   "sub_mean_for_data_augmentation": true,
   "test_data_augmentation": {},
   "test_dataset_size_limit": Infinity,
@@ -78,12 +55,13 @@
     0,
     Infinity
   ],
-  "train_data_augmentation": {},
+  "train_data_augmentation": {
+    "rotation": 360
+  },
   "train_dataset_size_limit": Infinity,
   "train_loss": [
     "cros_entr"
   ],
-  "train_max_size_per_class": null,
   "train_min_max_faces2use": [
     0,
     Infinity

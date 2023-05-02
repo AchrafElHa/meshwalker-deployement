@@ -9,7 +9,7 @@ from tqdm import tqdm
 import rnn_model
 import utils
 import dataset
-
+from pprint import pprint
 
 def calc_accuracy_test(dataset_expansion=False, logdir=None, labels=None, iter2use='last', classes_indices_to_use=None,
                        dnn_model=None, params=None, min_max_faces2use=[0, 4000], model_fn=None, n_walks_per_model=16, data_augmentation={}):
@@ -20,7 +20,7 @@ def calc_accuracy_test(dataset_expansion=False, logdir=None, labels=None, iter2u
     if model_fn is not None:
       pass
     elif iter2use != 'last':
-      model_fn = logdir + '/learned_model2keep--' + iter2use
+      model_fn = logdir + '/learned_model'
       model_fn = model_fn.replace('//', '/')
     else:
       model_fn = tf.train.latest_checkpoint(logdir)
@@ -28,6 +28,10 @@ def calc_accuracy_test(dataset_expansion=False, logdir=None, labels=None, iter2u
     params = copy.deepcopy(params)
   if logdir is not None:
     params.logdir = logdir
+  
+  print("\n\t",params.full_accuracy_test,"\n")
+
+  
   params.batch_size = 1
   params.n_walks_per_model = n_walks_per_model
   params.classes_indices_to_use = None
@@ -120,7 +124,9 @@ def main(job, job_part):
     np.random.seed(0)
     tf.random.set_seed(0)
     params = get_params(job, job_part)
-    accs, _ ,class_num= calc_accuracy_test(logdir="model_trained/0011-15.11.2020..13.54__cubes", **params.full_accuracy_test)
+    pprint(params)
+    print("\n\t",params.full_accuracy_test,"\n")
+    accs, _ ,class_num= calc_accuracy_test(logdir="model_trained/0010-15.11.2020..05.25__human_seg/", **params.full_accuracy_test)
     return class_num
 
 
