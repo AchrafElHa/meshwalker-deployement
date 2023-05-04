@@ -73,6 +73,7 @@ def calc_accuracy_test(dataset_expansion=False, logdir=None, labels=None, iter2u
 
   n_models = 0
   n_sucesses = 0
+  
   class_num = -1
   all_confusion_all_faces = np.zeros((n_classes, n_classes), dtype=np.int64)
   for k, v in pred_per_model_name.items():
@@ -126,7 +127,7 @@ def main(job, job_part):
     params = get_params(job, job_part)
     pprint(params)
     print("\n\t",params.full_accuracy_test,"\n")
-    accs, _ ,class_num= calc_accuracy_test(logdir="model_trained/0010-15.11.2020..05.25__human_seg/", **params.full_accuracy_test)
+    accs, _ ,class_num= calc_accuracy_test(logdir="runs/0010-15.11.2020..05.25__human_seg/", **params.full_accuracy_test)
     return class_num
 
 

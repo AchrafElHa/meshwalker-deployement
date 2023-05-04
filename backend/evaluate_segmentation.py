@@ -13,6 +13,8 @@ import dataset
 import dataset_prepare
 import utils
 
+from pprint import pprint
+
 
 def fill_edges(model):
   # To compare accuracies to MeshCNN, this function build edges & edges length in the same way they do
@@ -75,34 +77,47 @@ def calc_final_accuracy(models, print_details=False):
     best_pred = np.argmax(model['pred'], axis=-1)
     model['v_pred'] = best_pred
     pred_score = scipy.special.softmax(model['pred'], axis=1)
+
+    print("\n\n best score :",best_pred)
+
     # Calc edges accuracy
-    if 'edges_meshcnn' in model.keys(): # pred per edge
-      g = 0
-      gn = 0
-      for ei, edge in enumerate(model['edges_meshcnn']):
-        v0_pred = best_pred[edge[0]]
-        v0_score = pred_score[edge[0], v0_pred]
-        v1_pred = best_pred[edge[1]]
-        v1_score = pred_score[edge[1], v1_pred]
-        if v0_score > v1_score:
-          best = v0_pred - 1
-        else:
-          best = v1_pred - 1
-        if best < model['seseg'].shape[1]:
-          g  += (model['seseg'][ei, best] != 0)
-          gn += (model['seseg'][ei, best] != 0) * model['edges_length'][ei]
-      this_accuracy = g / model['edges_meshcnn'].shape[0]
-      norm_accuracy = gn / np.sum(model['edges_length'])
-      edges_accuracy.append(this_accuracy)
-      edges_norm_acc.append(norm_accuracy)
+    # if 'edges_meshcnn' in model.keys(): # pred per edge
+    #   g = 0
+    #   gn = 0
+    #   for ei, edge in enumerate(model['edges_meshcnn']):
+    #     v0_pred = best_pred[edge[0]]
+    #     v0_score = pred_score[edge[0], v0_pred]
+    #     v1_pred = best_pred[edge[1]]
+    #     v1_score = pred_score[edge[1], v1_pred]
+    #     if v0_score > v1_score:
+    #       best = v0_pred - 1
+    #     else:
+    #       best = v1_pred - 1
+    #     if best < model['seseg'].shape[1]:
+    #       g  += (model['seseg'][ei, best] != 0)
+    #       gn += (model['seseg'][ei, best] != 0) * model['edges_length'][ei]
+    #   this_accuracy = g / model['edges_meshcnn'].shape[0]
+    #   norm_accuracy = gn / np.sum(model['edges_length'])
+    #   edges_accuracy.append(this_accuracy)
+    #   edges_norm_acc.append(norm_accuracy)
 
     # Calc vertices accuracy
-    if 'area_vertices' not in model.keys():
-      dataset_prepare.calc_mesh_area(model)
+    # if 'area_vertices' not in model.keys():
+    #   dataset_prepare.calc_mesh_area(model)
+
+    #######  get prediction values ##########################################
+    model_name_split = model_name.split('/')
+    namefile = model_name_split[0].split('.')
+    a_file = open('prediction_values/' + namefile[0] + '.txt', 'w+')
+    for row in best_pred:
+      a_file.write("%s\n" % row)
+
+    a_file.close()
+
     this_accuracy = (best_pred == model['labels']).sum() / model['labels'].shape[0]
-    norm_accuracy = np.sum((best_pred == model['labels']) * model['area_vertices']) / model['area_vertices'].sum()
+    # norm_accuracy = np.sum((best_pred == model['labels']) * model['area_vertices']) / model['area_vertices'].sum()
     vertices_accuracy.append(this_accuracy)
-    vertices_norm_acc.append(norm_accuracy)
+    # vertices_norm_acc.append(norm_accuracy)
 
   if len(edges_accuracy) == 0:
     edges_accuracy = [0]
@@ -179,7 +194,7 @@ def calc_accuracy_test(logdir=None, dataset_expansion=None, dnn_model=None, para
       for w_step in range(all_seq.size):
         models[name]['pred'][all_seq[w_step]] += predictions4vertex[w_step]
         models[name]['pred_count'][all_seq[w_step]] += 1
-
+  print("models\n", models)
   postprocess_vertex_predictions(models)
   e_acc_after_postproc, v_acc_after_postproc, f_acc_after_postproc = calc_final_accuracy(models)
 
@@ -205,3 +220,14 @@ if __name__ == '__main__':
     accs, _ = calc_accuracy_test(logdir, dataset_expansion)
     print('Edge accuracy:', accs[0])
 
+def main(job, job_part):
+  from train_val import get_params
+  utils.config_gpu(True)
+  np.random.seed(0)
+  tf.random.set_seed(0)
+  params = get_params(job, job_part)
+  dataset_expansion = params.datasets2use['test'][0]
+  pprint(params)
+  print("\n\t",params.datasets2use['test'][0],"\n")
+  accs, _ = calc_accuracy_test(logdir="runs/0010-15.11.2020..05.25__human_seg/", dataset_expansion=dataset_expansion)
+  # return class_num

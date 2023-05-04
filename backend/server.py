@@ -4,6 +4,7 @@ import os
 import shutil
 import dataset_prepare
 import evaluate_classification
+import evaluate_segmentation
 
 app = Flask(__name__)
 
@@ -17,9 +18,11 @@ def upload():
     file.save(file_path)
     #dataset_prepare.prepare_one_dataset('cubes')
     print(file)
-    class_num = evaluate_classification.main("human_seg","--- model_trained/0010-15.11.2020..05.25__human_seg")
-    os.remove(file_path)
-    shutil.rmtree("datasets_processed")
-    return {'message': f"class num is {class_num}"}
+    # class_num = evaluate_classification.main("human_seg","--- runs/0010-15.11.2020..05.25__human_seg")
+    evaluate_segmentation.main("human_seg","--- runs/0010-15.11.2020..05.25__human_seg")
+    print("======> sala \n\n")
+    # os.remove(file_path)
+    # shutil.rmtree("datasets_processed")
+    return {'message': f"class num is {3}"}
 if __name__ == '__main__':
     app.run(debug=True)
