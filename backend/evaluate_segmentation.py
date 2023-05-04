@@ -69,6 +69,7 @@ def calc_final_accuracy(models, print_details=False):
   # 2. Normalized accuracy is calculated using the edge length or vertex "area" (which is the mean faces area for each vertex).
   vertices_accuracy = []; vertices_norm_acc = []
   edges_accuracy = []; edges_norm_acc = []
+  segmentation = {}
   for model_name, model in models.items():
     if model['labels'].size == 0:
       continue
@@ -86,8 +87,10 @@ def calc_final_accuracy(models, print_details=False):
         v1_score = pred_score[edge[1], v1_pred]
         if v0_score > v1_score:
           best = v0_pred - 1
+          segmentation[tuple(edge)] = v0_pred
         else:
           best = v1_pred - 1
+          segmentation[tuple(edge)] = v1_pred
         if best < model['seseg'].shape[1]:
           g  += (model['seseg'][ei, best] != 0)
           gn += (model['seseg'][ei, best] != 0) * model['edges_length'][ei]
@@ -107,7 +110,7 @@ def calc_final_accuracy(models, print_details=False):
   if len(edges_accuracy) == 0:
     edges_accuracy = [0]
 
-  return np.mean(edges_accuracy), np.mean(vertices_accuracy), np.nan
+  return np.mean(edges_accuracy), np.mean(vertices_accuracy), np.nan, segmentation
 
 
 def postprocess_vertex_predictions(models):
@@ -181,27 +184,26 @@ def calc_accuracy_test(logdir=None, dataset_expansion=None, dnn_model=None, para
         models[name]['pred_count'][all_seq[w_step]] += 1
 
   postprocess_vertex_predictions(models)
-  e_acc_after_postproc, v_acc_after_postproc, f_acc_after_postproc = calc_final_accuracy(models)
+  e_acc_after_postproc, v_acc_after_postproc, f_acc_after_postproc, segmentation = calc_final_accuracy(models)
 
-  return [e_acc_after_postproc, e_acc_after_postproc], dnn_model
+  return [e_acc_after_postproc, e_acc_after_postproc], dnn_model, segmentation
 
-
-if __name__ == '__main__':
+def main(job, job_part, logdir):
   from train_val import get_params
   utils.config_gpu(1)
   np.random.seed(0)
   tf.random.set_seed(0)
 
-  if len(sys.argv) != 4:
+  '''if len(sys.argv) != 4:
     print('<>'.join(sys.argv))
     print('Use: python evaluate_segmentation.py <job> <part> <trained model directory>')
     print('For example: python evaluate_segmentation.py coseg chairs pretrained/0009-14.11.2020..07.08__coseg_chairs')
   else:
     logdir = sys.argv[3]
-    job = sys.argv[1]
-    job_part = sys.argv[2]
-    params = get_params(job, job_part)
-    dataset_expansion = params.datasets2use['test'][0]
-    accs, _ = calc_accuracy_test(logdir, dataset_expansion)
-    print('Edge accuracy:', accs[0])
+    job = sys.argv[1]'''
+  params = get_params(job, job_part)
+  dataset_expansion = params.datasets2use['test'][0]
+  accs, _, segmentation = calc_accuracy_test(logdir, dataset_expansion)
+    #print('Edge accuracy:', accs[0])
+  return segmentation
 
