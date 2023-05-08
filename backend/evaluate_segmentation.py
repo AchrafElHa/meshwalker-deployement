@@ -40,26 +40,47 @@ def fill_edges(model):
   model['edges_length'] = edges_length
 
 
-def get_model_by_name(name):
-  fn = name[name.find(':')+1:]
-  mesh_data = np.load(fn, encoding='latin1', allow_pickle=True)
-  model = {'vertices': mesh_data['vertices'], 'faces': mesh_data['faces'], 'labels': mesh_data['labels'],
+# def get_model_by_name(name):
+#   fn = name[name.find(':')+1:]
+#   mesh_data = np.load(fn, encoding='latin1', allow_pickle=True)
+#   model = {'vertices': mesh_data['vertices'], 'faces': mesh_data['faces'], 'labels': mesh_data['labels'],
+#            'edges': mesh_data['edges']}
+
+#   if 'face_labels' in mesh_data.keys():
+#      model['face_labels'] = mesh_data['face_labels']
+
+#   if 'labels_fuzzy' in mesh_data.keys():
+#     model['labels_fuzzy'] = mesh_data['labels_fuzzy']
+#     fill_edges(model)
+#     model['seseg'] = np.zeros((model['edges_meshcnn'].shape[0], model['labels_fuzzy'].shape[1]))
+#     for e in range(model['edges_meshcnn'].shape[0]):
+#       v0, v1 = model['edges_meshcnn'][e]
+#       l0 = model['labels_fuzzy'][v0]
+#       l1 = model['labels_fuzzy'][v1]
+#       model['seseg'][e] = (l0 + l1) / 2
+
+#   return model
+
+def get_model_by_name(npz_path):
+    mesh_data = np.load(npz_path, encoding='latin1', allow_pickle=True)
+    model = {'vertices': mesh_data['vertices'], 'faces': mesh_data['faces'], 'labels': mesh_data['labels'],
            'edges': mesh_data['edges']}
 
-  if 'face_labels' in mesh_data.keys():
-     model['face_labels'] = mesh_data['face_labels']
+    if 'face_labels' in mesh_data.keys():
+        model['face_labels'] = mesh_data['face_labels']
 
-  if 'labels_fuzzy' in mesh_data.keys():
-    model['labels_fuzzy'] = mesh_data['labels_fuzzy']
-    fill_edges(model)
-    model['seseg'] = np.zeros((model['edges_meshcnn'].shape[0], model['labels_fuzzy'].shape[1]))
-    for e in range(model['edges_meshcnn'].shape[0]):
-      v0, v1 = model['edges_meshcnn'][e]
-      l0 = model['labels_fuzzy'][v0]
-      l1 = model['labels_fuzzy'][v1]
-      model['seseg'][e] = (l0 + l1) / 2
+    if 'labels_fuzzy' in mesh_data.keys():
+        model['labels_fuzzy'] = mesh_data['labels_fuzzy']
+        fill_edges(model)
+        model['seseg'] = np.zeros((model['edges_meshcnn'].shape[0], model['labels_fuzzy'].shape[1]))
+        for e in range(model['edges_meshcnn'].shape[0]):
+            v0, v1 = model['edges_meshcnn'][e]
+            l0 = model['labels_fuzzy'][v0]
+            l1 = model['labels_fuzzy'][v1]
+            model['seseg'][e] = (l0 + l1) / 2
 
-  return model
+    return model
+
 
 
 def calc_final_accuracy(models, print_details=False):
@@ -108,7 +129,7 @@ def calc_final_accuracy(models, print_details=False):
     #######  get prediction values ##########################################
     model_name_split = model_name.split('/')
     namefile = model_name_split[0].split('.')
-    a_file = open('prediction_values/' + namefile[0] + '.txt', 'w+')
+    a_file = open('./prediction_values/' + namefile[0] + '.txt', 'w+')
     for row in best_pred:
       a_file.write("%s\n" % row)
 
@@ -141,6 +162,7 @@ def postprocess_vertex_predictions(models):
       else:
         av_pred[v] = this_pred
     model['pred'] = av_pred
+  print("test_pred\n", model['pred'])
 
 
 def calc_accuracy_test(logdir=None, dataset_expansion=None, dnn_model=None, params=None,
@@ -159,11 +181,12 @@ def calc_accuracy_test(logdir=None, dataset_expansion=None, dnn_model=None, para
   params.batch_size = 1
   params.net_input.append('vertex_indices')
   params.n_walks_per_model = n_walks_per_model
+  params.net_input_dim = 4
 
   # Prepare the dataset
-  test_dataset, n_items = dataset.tf_mesh_dataset(params, dataset_expansion, mode=params.network_task,
-                                                  shuffle_size=0, size_limit=np.inf, permute_file_names=False,
-                                                  must_run_on_all=True, data_augmentation=data_augmentation)
+  # test_dataset, n_items = dataset.tf_mesh_dataset(params, dataset_expansion, mode=params.network_task,
+  #                                                 shuffle_size=0, size_limit=np.inf, permute_file_names=False,
+  #                                                 must_run_on_all=True, data_augmentation=data_augmentation)
 
   # If dnn_model is not provided, load it
   if dnn_model is None:
@@ -174,31 +197,40 @@ def calc_accuracy_test(logdir=None, dataset_expansion=None, dnn_model=None, para
   skip = int(params.seq_len * 0.5)
   models = {}
 
-  # Go through the dataset n_iters times
-  for _ in tqdm(range(n_iters)):
-    for name_, model_ftrs_, labels_ in test_dataset:
-      name = name_.numpy()[0].decode()
-      assert name_.shape[0] == 1
-      model_ftrs = model_ftrs_[:, :, :, :-1]
-      all_seq = model_ftrs_[:, :, :, -1].numpy()
-      if name not in models.keys():
-        models[name] = get_model_by_name(name)
-        models[name]['pred'] = np.zeros((models[name]['vertices'].shape[0], params.n_classes))
-        models[name]['pred_count'] = 1e-6 * np.ones((models[name]['vertices'].shape[0], )) # Initiated to a very small number to avoid devision by 0
+  # models = {}
+  npz_path = 'datasets_processed/human_seg_from_meshcnn/train_adobe__FemaleFitD_tri_fixed_not_changed_1500.npz'
+  model_name = os.path.basename(npz_path)
+  models[model_name] = get_model_by_name(npz_path)
+  models[model_name]['pred'] = np.zeros((models[model_name]['vertices'].shape[0], params.n_classes))
+  models[model_name]['pred_count'] = 1e-6 * np.ones((models[model_name]['vertices'].shape[0], ))
 
-      sp = model_ftrs.shape
-      ftrs = tf.reshape(model_ftrs, (-1, sp[-2], sp[-1]))
-      predictions = dnn_model(ftrs, training=False).numpy()[:, skip:]
-      all_seq = all_seq[0, :, skip + 1:].reshape(-1).astype(np.int32)
-      predictions4vertex = predictions.reshape((-1, predictions.shape[-1]))
-      for w_step in range(all_seq.size):
-        models[name]['pred'][all_seq[w_step]] += predictions4vertex[w_step]
-        models[name]['pred_count'][all_seq[w_step]] += 1
+
+  # Go through the dataset n_iters times
+  # for _ in tqdm(range(n_iters)):
+  #   for name_, model_ftrs_, labels_ in test_dataset:
+  #     name = name_.numpy()[0].decode()
+  #     assert name_.shape[0] == 1
+  #     model_ftrs = model_ftrs_[:, :, :, :-1]
+  #     all_seq = model_ftrs_[:, :, :, -1].numpy()
+  #     if name not in models.keys():
+  #       models[name] = get_model_by_name(name)
+  #       models[name]['pred'] = np.zeros((models[name]['vertices'].shape[0], params.n_classes))
+  #       models[name]['pred_count'] = 1e-6 * np.ones((models[name]['vertices'].shape[0], )) # Initiated to a very small number to avoid devision by 0
+
+  #     sp = model_ftrs.shape
+  #     ftrs = tf.reshape(model_ftrs, (-1, sp[-2], sp[-1]))
+  #     predictions = dnn_model(ftrs, training=False).numpy()[:, skip:]
+  #     all_seq = all_seq[0, :, skip + 1:].reshape(-1).astype(np.int32)
+  #     predictions4vertex = predictions.reshape((-1, predictions.shape[-1]))
+  #     for w_step in range(all_seq.size):
+  #       models[name]['pred'][all_seq[w_step]] += predictions4vertex[w_step]
+  #       models[name]['pred_count'][all_seq[w_step]] += 1
   print("models\n", models)
   postprocess_vertex_predictions(models)
+  
   e_acc_after_postproc, v_acc_after_postproc, f_acc_after_postproc = calc_final_accuracy(models)
 
-  return [e_acc_after_postproc, e_acc_after_postproc], dnn_model
+  return [e_acc_after_postproc, e_acc_after_postproc], dnn_model,models[model_name]
 
 
 if __name__ == '__main__':
@@ -229,5 +261,6 @@ def main(job, job_part):
   dataset_expansion = params.datasets2use['test'][0]
   pprint(params)
   print("\n\t",params.datasets2use['test'][0],"\n")
-  accs, _ = calc_accuracy_test(logdir="runs/0010-15.11.2020..05.25__human_seg/", dataset_expansion=dataset_expansion)
+  accs, _,model__ = calc_accuracy_test(logdir="runs/0010-15.11.2020..05.25__human_seg/", dataset_expansion=dataset_expansion)
+  print('Edge accuracy:', model__)
   # return class_num
