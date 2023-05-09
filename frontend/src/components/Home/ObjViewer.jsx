@@ -22,6 +22,7 @@ function OBJViewer(props){
 
   const loader = new OBJLoader();
 
+  console.log("props.url ::"+props.url);
   loader.load(props.url, function(obj) {
     console.log(obj)
     scene.add(obj);

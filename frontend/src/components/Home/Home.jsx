@@ -42,13 +42,14 @@ function Home() {
 
     reader.readAsText(file);
     try {
-      var response = await axios.post('http://localhost:5000/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      console.log(response.data); // Do something with the response data
-      toast.success(response.data.message, toastOptions);
+      // var response = await axios.post('http://localhost:5000/upload', formData, {
+      //   headers: {
+      //     'Content-Type': 'multipart/form-data'
+      //   }
+      // });
+      // console.log(response.data); // Do something with the response data
+      toast.success("response.data.message", toastOptions);
+      console.log("objUrl :"+objUrl);
     } catch (error) {
       console.log(error); // Handle any errors
     }
@@ -67,7 +68,7 @@ function Home() {
                     </div><br />
 
                     <form onSubmit={handleSubmit}>
-                        <div className="form-group" id>
+                        <div className="form-group" >
                             {showObjViewer && <ObjViewer url={objUrl}/>}
                             <label className="form-label"><h3>Choose a file:</h3></label>
                             <input type="file" className="form-control-file" accept=".obj" onChange={handleFileChange} />
