@@ -61,7 +61,8 @@ class RnnWalkBase(tf.keras.Model):
       f.write(st + '\n')
 
   def _get_latest_keras_model(self):
-    filenames = glob.glob(self._params.logdir + 'learned_model*')
+    filenames = glob.glob(self._params.logdir + '/learned_model*')
+    print(filenames,"here")
     iters_saved = [1]
     return filenames[np.argmax(iters_saved)]
 
