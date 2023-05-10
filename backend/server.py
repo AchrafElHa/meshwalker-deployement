@@ -7,6 +7,9 @@ import evaluate_segmentation
 app = Flask(__name__)
 
 CORS(app, resources={r"/*": {"origins": "*"}})
+@app.route('/',methods=['GET'])
+def index():
+    return ("index page is working ..")
 
 @app.route('/upload', methods=['POST'])
 def upload():
