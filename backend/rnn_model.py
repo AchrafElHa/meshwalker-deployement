@@ -61,8 +61,11 @@ class RnnWalkBase(tf.keras.Model):
       f.write(st + '\n')
 
   def _get_latest_keras_model(self):
-    filenames = glob.glob(self._params.logdir + 'learned_model*')
-    iters_saved = [1]
+    print("am in last keras ",self._params.logdir + '/learned_model*')
+    filenames = glob.glob(self._params.logdir + '/learned_model*')
+    iters_saved = [0]
+    # iters_saved = [int(f.split('learned_model')[-1].split('.keras')[0]) for f in filenames]
+    print(filenames)
     return filenames[np.argmax(iters_saved)]
 
   def load_weights(self, filepath=None):

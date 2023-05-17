@@ -1,46 +1,87 @@
-import React, { useRef, useState, useEffect} from 'react';
+import { useLocation } from "react-router-dom";
+import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-function OBJViewer(props){
-    useEffect(()=>{
-    const scene = new THREE.Scene();
-    //const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
-		//scene.add( ambientLight );
 
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 5;
-    const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-		camera.add( pointLight );
-		scene.add( camera );
+function OBJViewer() {
+  const { state } = useLocation();
+  const file = state.file;
+
+  const [objUrl, setObjUrl] = useState(null);
+  const [showObjViewer, setShowObjViewer] = useState(false);
+
+  const containerRef = useRef(null);
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer();
+
+  useEffect(() => {
+    const handleWindowResize = () => {
+      const { current: container } = containerRef;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    };
+
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => window.removeEventListener('resize', handleWindowResize);
+  }, []);
+
+  useEffect(() => {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const url = URL.createObjectURL(new Blob([event.target.result], { type: 'text/plain' }));
+      setObjUrl(url);
+      setShowObjViewer(true);
+    };
+    reader.readAsText(file);
+  }, [file]);
+
+  useEffect(() => {
+    if (!showObjViewer || !objUrl) return;
+
+    const { current: container } = containerRef;
 
     const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(500, 500);
-    document.getElementById("objViewerDiv").appendChild(renderer.domElement);
-    renderer.render(scene, camera);
-    console.log('Component mounted!');
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
 
-  const loader = new OBJLoader();
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.z = 5;
 
-  loader.load(props.url, function(obj) {
-    console.log(obj)
-    scene.add(obj);
-  });
-  function render() {
+    const controls = new OrbitControls(camera, renderer.domElement);
 
-    window.requestAnimationFrame( render );
-    renderer.render( scene, camera );
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color( 0xffffff );
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 1).normalize();
+    scene.add(light);
 
-  }
+    const loader = new OBJLoader();
+    loader.load("http://localhost:5000/models/"+file.name, (object) => {
+      scene.add(object);
+    });
 
-  render();
-  return () => {
-    renderer.dispose();
-    document.getElementById("objViewerDiv").removeChild(renderer.domElement);
-    scene.remove(...scene.children);
-  };
-}, [props.url]);
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
 
+    return () => {
+      renderer.dispose();
+      container.removeChild(renderer.domElement);
+      scene.remove(...scene.children);
+    };
+  }, [showObjViewer, objUrl]);
+
+  return <><main><div className="aboutus-holder"><br /><h1>file :</h1><br /><div ref={containerRef} className='description-holder'/></div></main></>;
 }
 
 export default OBJViewer;

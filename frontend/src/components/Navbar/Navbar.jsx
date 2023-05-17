@@ -29,19 +29,14 @@ export default function Navbar () {
                     <h3>Qui sommes nous ?</h3>
                 </NavLink>
 
-                <NavLink to="/contact">
+                <NavLink to="/contactUs">
                     <span className="material-icons-sharp">receipt_long</span>
                     <h3>Contact</h3>
                 </NavLink>
 
-                {/* <NavLink to="/products">
-                    <span className="material-icons-sharp">inventory</span>
-                    <h3>Products</h3>
-                </NavLink> */}
-
                 <NavLink to="/setting">
                     <span className="material-icons-sharp">settings</span>
-                    <h3>Settings</h3>
+                    <h3>Paramètre</h3>
                 </NavLink>
 
                 <NavLink to="/logout" >
