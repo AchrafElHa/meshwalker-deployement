@@ -70,6 +70,17 @@ def calc_final_accuracy(models, print_details=False):
   vertices_accuracy = []; vertices_norm_acc = []
   edges_accuracy = []; edges_norm_acc = []
   segmentation = {}
+  segmentation_ ={}
+  for fi, face in enumerate(model['faces']):
+        v0_pred = best_pred[face[0]]
+        v1_pred = best_pred[face[1]]
+        v2_pred = best_pred[face[2]]
+        prediction_per_vertice = [(face[0], v0_pred), (face[1], v1_pred), (face[2], v2_pred)]
+        all_predictions = [v0_pred, v1_pred, v2_pred]
+        if len(set(all_predictions)) == 3:
+            segmentation_[str(face)] = int(sorted(prediction_per_vertice, key = lambda x : pred_score[x[0], x[1]], reverse = True)[0][1])
+        else:
+            segmentation_[str(face)] = int(sorted(all_predictions, key = lambda x : all_predictions.count(x), reverse = True)[0])
   for model_name, model in models.items():
     if model['labels'].size == 0:
       continue
@@ -110,7 +121,7 @@ def calc_final_accuracy(models, print_details=False):
   if len(edges_accuracy) == 0:
     edges_accuracy = [0]
 
-  return np.mean(edges_accuracy), np.mean(vertices_accuracy), np.nan, segmentation
+  return np.mean(edges_accuracy), np.mean(vertices_accuracy), np.nan, segmentation_
 
 
 def postprocess_vertex_predictions(models):
