@@ -108,9 +108,9 @@ def calc_final_accuracy(models, print_details=False):
         prediction_per_vertice = [(face[0], v0_pred), (face[1], v1_pred), (face[2], v2_pred)]
         all_predictions = [v0_pred, v1_pred, v2_pred]
         if len(set(all_predictions)) == 3:
-            segmentation_[str(face)] = int(sorted(prediction_per_vertice, key = lambda x : pred_score[x[0], x[1]], reverse = True)[0][1])
+            segmentation_[fi] = int(sorted(prediction_per_vertice, key = lambda x : pred_score[x[0], x[1]], reverse = True)[0][1])
         else:
-            segmentation_[str(face)] = int(sorted(all_predictions, key = lambda x : all_predictions.count(x), reverse = True)[0])
+            segmentation_[fi] = int(sorted(all_predictions, key = lambda x : all_predictions.count(x), reverse = True)[0])
 
 
     # Calc vertices accuracy
