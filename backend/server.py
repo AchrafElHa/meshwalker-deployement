@@ -1,12 +1,10 @@
 from flask import Flask, request, jsonify
-from flask_ngrok import run_with_ngrok
 from flask_cors import CORS
 import os
 import shutil
 import dataset_prepare
 import evaluate_segmentation
 app = Flask(__name__)
-run_with_ngrok(app)
 
 CORS(app, resources={r"/*": {"origins": "*"}})
 @app.route('/',methods=['GET'])
@@ -24,7 +22,7 @@ def upload():
     shutil.rmtree("datasets_processed")
     return jsonify(segmentation)
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0",port=5000)
 
 
 
