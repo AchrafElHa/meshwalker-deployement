@@ -22,7 +22,7 @@ def upload():
     shutil.rmtree("datasets_processed")
     return jsonify(segmentation)
 if __name__ == "__main__":
-    app.run(port=80)
+    app.run(port=5000)
 
 
 
