@@ -53,7 +53,7 @@ function Home() {
     // console.log("url",objUrl);
 
     try {
-      var response = await axios.post('http://localhost:5000/upload', formData, {
+      var response = await axios.post('https://6810-34-126-139-41.ngrok-free.app/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

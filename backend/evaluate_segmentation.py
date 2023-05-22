@@ -320,7 +320,7 @@ def calc_final_accuracy(models, print_details=False):
         v2_pred = best_pred[face[2]]
         prediction_per_vertice = [(face[0], v0_pred), (face[1], v1_pred), (face[2], v2_pred)]
         all_predictions = [v0_pred, v1_pred, v2_pred]
-        print(prediction_per_vertice)
+        print("prediction_per_vertice",prediction_per_vertice)
         if len(set(all_predictions)) == 3:
             segmentation__[str(face)] = int(sorted(prediction_per_vertice, key = lambda x : pred_score[x[0], x[1]], reverse = True)[0][1])
         else:
@@ -443,9 +443,7 @@ def calc_accuracy_test(logdir=None, dataset_expansion=None, dnn_model=None, para
         models[model_name]['pred_count'][all_seq[w_step]] += 1
 
 
-  print(2)
-  preddd = postprocess_vertex_predictions(models)
-  print(preddd,"\n")
+  postprocess_vertex_predictions(models)
   print(3)
   e_acc_after_postproc, v_acc_after_postproc, f_acc_after_postproc = calc_final_accuracy(models)
 
