@@ -64,8 +64,7 @@ function OBJViewer() {
     scene.add(light);
 
     const loader = new OBJLoader();
-    loader.load("https://4a48-34-126-139-41.ngrok-free.app/models/"+file.name, (object) => {
-      console.log(object);
+    loader.load("https://954e-35-187-237-56.ngrok-free.app/models/"+file.name, (object) => {
       scene.add(object);
     });
 

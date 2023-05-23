@@ -17,12 +17,12 @@ def upload():
     file.save(file_path)
     print("file to save ::",file,"\npath ::",file_path,"\n")
     # dataset_prepare.prepare_one_dataset("human_seg")
-    evaluate_segmentation.main("human_seg","human_seg","0010-15.11.2020..05.25__human_seg/",file_path)
+    segments_val = evaluate_segmentation.main("human_seg","human_seg","0010-15.11.2020..05.25__human_seg/",file_path)
     # os.remove(file_path)
     # shutil.rmtree("datasets_processed")
     # print("seg",segmentation)
-    message_to_show = "segementation is "
-    return {'message': message_to_show}
+    return {'message': "model finished","seg" : segments_val}
+
 
 @app.route('/models/<path:filename>')
 def serve_model(filename):
