@@ -177,8 +177,7 @@ def calc_accuracy_test(logdir=None, dataset_expansion=None, dnn_model=None, para
   models = {}
 
   # Go through the dataset n_iters times
-  for _ in tqdm(range(n_iters)):
-    for name_, model_ftrs_, labels_ in test_dataset:
+  for name_, model_ftrs_, labels_ in test_dataset:
       name = name_.numpy()[0].decode()
       assert name_.shape[0] == 1
       model_ftrs = model_ftrs_[:, :, :, :-1]
