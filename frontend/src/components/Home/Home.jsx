@@ -17,6 +17,7 @@ function Home() {
   const [file, setFile] = useState(null);
   const [objUrl, setObjUrl] = useState(null);
   const [showObjViewer, setShowObjViewer] = useState(false);
+  const [segmentation, setSegmentation] = useState(null);
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
   };
@@ -25,7 +26,7 @@ function Home() {
     event.preventDefault();
     var formData = new FormData();
     formData.append('objFile', file);
-    console.log(file);
+    //console.log(file);
     if(file.name.split('.').pop() !== 'obj') {
       toast.error('Please upload a .obj file', toastOptions);
       return;
@@ -36,18 +37,18 @@ function Home() {
       const url = URL.createObjectURL(new Blob([event.target.result], { type: 'text/plain' }));
       setObjUrl(url);
       setShowObjViewer(true);
-      console.log("here");
       
     };
 
     reader.readAsText(file);
     try {
-      var response = await axios.post('http://localhost:5000/upload', formData, {
+      var response = await axios.post('https://167b-35-192-85-103.ngrok-free.app/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log(response.data); // Do something with the response data
+      //console.log(response.data); // Do something with the response data
+      setSegmentation(response.data);
       toast.success(response.data.message, toastOptions);
     } catch (error) {
       console.log(error); // Handle any errors
@@ -68,7 +69,7 @@ function Home() {
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-group" id>
-                            {showObjViewer && <ObjViewer url={objUrl}/>}
+                            {showObjViewer && <ObjViewer url={objUrl} segmentation={segmentation} key={segmentation}/>}
                             <label className="form-label"><h3>Choose a file:</h3></label>
                             <input type="file" className="form-control-file" accept=".obj" onChange={handleFileChange} />
                         </div>
