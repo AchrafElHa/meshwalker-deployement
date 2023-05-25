@@ -89,10 +89,10 @@ def calc_final_accuracy(models, print_details=False):
       all_predictions = [v0_pred, v1_pred, v2_pred]
       # print("prediction_per_vertice",prediction_per_vertice)
       if len(set(all_predictions)) == 3:
-          segmentation__[str(face)] = int(sorted(prediction_per_vertice, key = lambda x : pred_score[x[0], x[1]], reverse = True)[0][1])
+          segmentation__[fi] = int(sorted(prediction_per_vertice, key = lambda x : pred_score[x[0], x[1]], reverse = True)[0][1])
           segmentation.append(int(sorted(prediction_per_vertice, key = lambda x : pred_score[x[0], x[1]], reverse = True)[0][1]))
       else:
-          segmentation__[str(face)] = int(sorted(all_predictions, key = lambda x : all_predictions.count(x), reverse = True)[0])
+          segmentation__[fi] = int(sorted(all_predictions, key = lambda x : all_predictions.count(x), reverse = True)[0])
           segmentation.append(int(sorted(all_predictions, key = lambda x : all_predictions.count(x), reverse = True)[0])) 
             
         
@@ -131,7 +131,7 @@ def calc_final_accuracy(models, print_details=False):
     json.dump(segmentation__, f, indent=4)
   print("hi ",model['v_pred'])
   print("hi2",segmentation__)
-  return np.mean([1,2,3,4]), np.mean([5,4,6,3]), np.nan,segmentation
+  return np.mean([1,2,3,4]), np.mean([5,4,6,3]), np.nan,segmentation__
 
 
 def postprocess_vertex_predictions(models):

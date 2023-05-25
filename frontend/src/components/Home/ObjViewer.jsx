@@ -8,15 +8,18 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 function OBJViewer() {
   const { state } = useLocation();
   const file = state.file;
+  const segmentation = state.segmentation;
 
   const [objUrl, setObjUrl] = useState(null);
   const [showObjViewer, setShowObjViewer] = useState(false);
+  const [segemantationval, setSegemantationVal] = useState(null);
 
   const containerRef = useRef(null);
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   const renderer = new THREE.WebGLRenderer();
 
   useEffect(() => {
+    setSegemantationVal(segmentation);
     const handleWindowResize = () => {
       const { current: container } = containerRef;
       const width = container.clientWidth;
@@ -64,15 +67,39 @@ function OBJViewer() {
     scene.add(light);
 
     const loader = new OBJLoader();
-    loader.load("https://954e-35-187-237-56.ngrok-free.app/models/"+file.name, (object) => {
+    loader.load("https://20b5-34-126-88-169.ngrok-free.app/models/"+file.name, (object) => {
+      let geometry = object.children[0].geometry;  
       scene.add(object);
+      if (segemantationval != null){
+        let colors_ = [[255,0,0,1],[0,255,0,1],[0,0,255,1],[255,255,0,1],[255,0,255,1],[0,255,255,1],[0,0,0,1],[255,255,255,1]]
+        let colorisation = []
+        for (let i=0;i<geometry.attributes.position.count/3;i++){
+          try{
+            let tmp = colors_[segemantationval[i]-1]
+            colorisation.push(tmp[0],tmp[1],tmp[2],tmp[3]);
+            colorisation.push(tmp[0],tmp[1],tmp[2],tmp[3]);
+            colorisation.push(tmp[0],tmp[1],tmp[2],tmp[3]);
+    
+            }
+          catch {console.log("error",segemantationval[i]-1);}
+        }
+        const material = new THREE.MeshBasicMaterial({
+            vertexColors: true
+        });
+        geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorisation, 4 ));
+          let mesh = new THREE.Mesh(geometry, material);
+          scene.add(mesh);
+          animate();
+        }
+
     });
 
     function animate() {
       requestAnimationFrame(animate);
+      controls.update();
       renderer.render(scene, camera);
     }
-    animate();
+    // animate();
 
     return () => {
       renderer.dispose();

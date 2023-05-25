@@ -1,4 +1,4 @@
-from flask import Flask, request,send_from_directory
+from flask import Flask, request,send_from_directory,jsonify
 from flask_cors import CORS
 import os
 import shutil
@@ -21,7 +21,7 @@ def upload():
     # os.remove(file_path)
     # shutil.rmtree("datasets_processed")
     # print("seg",segmentation)
-    return {'message': "model finished","seg" : segments_val}
+    return jsonify(segments_val)
 
 
 @app.route('/models/<path:filename>')
