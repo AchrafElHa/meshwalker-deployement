@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
+import { loadRoute } from "../../utils/ApiRoutes";
 
 function OBJViewer() {
   const { state } = useLocation();
@@ -67,7 +67,7 @@ function OBJViewer() {
     scene.add(light);
 
     const loader = new OBJLoader();
-    loader.load("https://20b5-34-126-88-169.ngrok-free.app/models/"+file.name, (object) => {
+    loader.load(loadRoute+file.name, (object) => {
       let geometry = object.children[0].geometry;  
       scene.add(object);
       if (segemantationval != null){

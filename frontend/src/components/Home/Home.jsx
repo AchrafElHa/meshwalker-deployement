@@ -4,7 +4,8 @@ import '../../assets/css/home.css';
 import '../../assets/css/ObjViewer.css';
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"
+import "react-toastify/dist/ReactToastify.css";
+import { homeRoute } from "../../utils/ApiRoutes";
 
 function Home() {
   const toastOptions = {
@@ -29,7 +30,7 @@ function Home() {
       return;
     }
     try {
-      var response = await axios.post('https://20b5-34-126-88-169.ngrok-free.app/upload', formData, {
+      var response = await axios.post(homeRoute, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

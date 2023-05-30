@@ -8,11 +8,13 @@ import About from './components/About/About';
 import ObjViewer from './components/Home/ObjViewer';
 import Contact from './components/Contact/Contact';
 import Setting from './components/Setting/Setting';
+import MainLogin from './components/Login/MainLogin';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+      <Route path="/login" element={<MainLogin />} />
         <Route element={<PrivateRoutes />}>
             <Route path="/" element={<Root />}>
                 <Route path="home" element={<Home />} />
@@ -20,6 +22,7 @@ function App() {
                 <Route path="aboutus" element={<About />} />
                 <Route path="contactUs" element={<Contact />} />
                 <Route path="setting" element={<Setting />} />
+                {/* <Route path="login" element={<MainLogin />} /> */}
             </Route>
         </Route>
         <Route path="*" element={<h1>mmmmm</h1>} />
