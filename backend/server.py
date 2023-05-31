@@ -13,7 +13,7 @@ load_dotenv()
 
 URL_LINK = os.getenv("URL_LINK")
 
-cluster = MongoClient("mongodb+srv://yassine:sprhazD09jqVfJPW@cluster0.m7rxd0b.mongodb.net/3dsf?retryWrites=true&w=majority")
+cluster = MongoClient(URL_LINK)
 db = cluster["3dsf"]
 
 CORS(app, resources={r"/*": {"origins": "*"}})
