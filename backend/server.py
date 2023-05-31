@@ -5,6 +5,7 @@ import pymongo
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
+import bcrypt
 
 app = Flask(__name__)
 app.secret_key = "maked by yassine boujrada"
@@ -12,7 +13,7 @@ load_dotenv()
 
 URL_LINK = os.getenv("URL_LINK")
 
-cluster = MongoClient(URL_LINK)
+cluster = MongoClient("mongodb+srv://yassine:sprhazD09jqVfJPW@cluster0.m7rxd0b.mongodb.net/3dsf?retryWrites=true&w=majority")
 db = cluster["3dsf"]
 
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -20,17 +21,31 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     data = request.get_json()
-    print(data)
     email = data["email"]
     password = data["password"]
-    print(email,password)
     collection = db["users"]
     query = {"email":email,"password":password}
     result = collection.find_one(query)
-    if result:
-        return jsonify({"status":200,"data":result})
+    if result != None :
+      token_to_send = bcrypt.hashpw(bytes(email,'ascii'), bcrypt.gensalt(rounds=15))
+      print(token_to_send)
+      return jsonify({"status":200,"data":result["email"],"token":token_to_send.decode("utf-8")})
     else:
         return jsonify({"status":500})
+    
+@app.route('/api/auth/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    email = data["email"]
+    password = data["password"]
+    collection = db["users"]
+    try:
+      collection.insert_one({"email":email,"password":password})
+      return jsonify({"status":200})
+    except:
+        return jsonify({"status":500})
+
+
 
 @app.route('/upload', methods=['POST'])
 def upload():

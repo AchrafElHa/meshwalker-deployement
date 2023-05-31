@@ -9,12 +9,14 @@ import ObjViewer from './components/Home/ObjViewer';
 import Contact from './components/Contact/Contact';
 import Setting from './components/Setting/Setting';
 import MainLogin from './components/Login/MainLogin';
+import Register from './components/Login/Register';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
       <Route path="/login" element={<MainLogin />} />
+      <Route path="/SignIn" element={<Register />} />
         <Route element={<PrivateRoutes />}>
             <Route path="/" element={<Root />}>
                 <Route path="home" element={<Home />} />

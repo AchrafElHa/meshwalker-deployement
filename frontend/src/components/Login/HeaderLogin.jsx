@@ -4,8 +4,7 @@ export default function HeaderLogin() {
     return (
         <div>
             <div className="logo-panel-header">
-                {/* <img src={creditcard} alt="logo" width="65px"/> */}
-                <div>Stock Management</div>
+                <div>Bienvenue <span style={{"color":"#ff9800"}}>sur</span> notre <span style={{"color":"#ff9800"}}>site</span></div>
             </div>
         </div>
     )
