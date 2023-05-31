@@ -54,6 +54,10 @@ export default function LoginBody() {
                 "Auth",
                 JSON.stringify(data.token)
               );
+              localStorage.setItem(
+                "email",
+                JSON.stringify(data.data)
+              );
               navigate("/home");
             }
             else{

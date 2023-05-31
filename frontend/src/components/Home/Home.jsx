@@ -45,13 +45,13 @@ function Home() {
   return (
     <>
         <main>
-            <h1>Home :</h1><br /><br />
-            <div className="aboutus-holder" id="aboutus-holder"><br />
+            <div ><br />
+            <h1 style={{"marginLeft":"60px"}}>Home :</h1><br /><br /><br />
+            <div className='description-holder'>
                 <div className='form-holder'>
                     <div className='title-form'> 
                         <h2>Choose a file to upload</h2>
                     </div><br />
-
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label className="form-label"><h3>Choose a file:</h3></label>
@@ -62,11 +62,8 @@ function Home() {
                         </div>
                     </form>
                 </div>
+                </div>
             </div>
-
-            <div id='objViewerDiv'>
-
-    </div>
         </main>
         <ToastContainer />
     </>
